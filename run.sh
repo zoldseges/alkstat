@@ -2,7 +2,6 @@
 
 DIR=`pwd`
 
-pushd ..
-echo $DIR
+pushd .. > /dev/null
 python checker.py sol=$DIR/release/$1.bin lang=binary problem=$1
-popd
+popd > /dev/null
