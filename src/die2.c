@@ -1,36 +1,63 @@
 #include <stdio.h>
 #include <assert.h>
 
-void walk_tree(int *arr, int acc, int depth, int max_depth) {
-  if (depth == max_depth) {
-    arr[acc]++;
-  } else {
-    depth++;
-    for(int i = 1; i < 7; ++i) {
-      walk_tree(arr, acc + i, depth, max_depth);
+#define MAX_DICE 55
+#define NUMBER_OF_SIDES 6
+#define BUF_SZ NUMBER_OF_SIDES * MAX_DICE - (MAX_DICE-1)
+
+void calc_next(int *next_buf, int *prev_buf, size_t buf_sz) {
+  for(int i = 0;
+      i < NUMBER_OF_SIDES || prev_buf[i-NUMBER_OF_SIDES + 1] != -1;
+      ++i) {
+    next_buf[i] = 0;
+    for(int j = 0;
+	j <= i && j < NUMBER_OF_SIDES;
+	++j) {
+      int curr = prev_buf[i - j];
+      if(curr > 0) {
+	next_buf[i] += curr;
+      }
     }
   }
 }
 
-int solve_and_print(int P) {
-  assert(P > 0 && P < 55);
-  // n ... 6P == 5P
-  int size = (6 * P) + 1;
-  int arr[512] = {0};
-  int sum = 0;
-  walk_tree(arr, 0, 0, P);
-  for(int i = 0; i < size; ++i) {
-    sum += arr[i];
-  }
-  for(int i = P; i < size; ++i) {
-    printf("%f\n", (double)arr[i] / sum);
-  }
-  
-}
-
 int main(int argc, char *argv) {
-  int P;
-  scanf("%d", &P);
-  solve_and_print(P);
+  int ndice;
+  scanf("%d", &ndice);
+  assert(ndice > 0 && ndice < MAX_DICE);
+
+  int bbuf[BUF_SZ];
+  int fbuf[BUF_SZ];
+  // zeroing out
+  for(int i = 0; i < BUF_SZ; ++i) {
+    bbuf[i] = -1;
+    fbuf[i] = -1;
+  }
+
+  // first row
+  for(int i = 0; i < NUMBER_OF_SIDES; ++i) {
+    bbuf[i] = 1;
+  }
+
+  int *res = bbuf;
+  for(int i = 1; i <= ndice; ++i) {
+    // alternating buffers
+    if (i % 2 == 0) {
+      calc_next(bbuf, fbuf, BUF_SZ);
+      res = fbuf;
+    } else {
+      calc_next(fbuf, bbuf, BUF_SZ);
+      res = bbuf;
+    }
+  }
+
+  int sum = 0;
+  for(int i = 0; res[i] != -1; ++i) {
+    sum += res[i];
+  }
+
+  for(int i = 0; res[i] != -1; ++i) {
+    printf("%lf\n", res[i] / (double)sum);
+  }
   return 0;
 }
