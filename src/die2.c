@@ -5,7 +5,7 @@
 #define NUMBER_OF_SIDES 6
 #define BUF_SZ NUMBER_OF_SIDES * MAX_DICE - (MAX_DICE-1)
 
-void calc_next(int *next_buf, int *prev_buf, size_t buf_sz) {
+void calc_next(double *next_buf, double *prev_buf, size_t buf_sz) {
   for(int i = 0;
       i < NUMBER_OF_SIDES || prev_buf[i-NUMBER_OF_SIDES + 1] != -1;
       ++i) {
@@ -13,7 +13,7 @@ void calc_next(int *next_buf, int *prev_buf, size_t buf_sz) {
     for(int j = 0;
 	j <= i && j < NUMBER_OF_SIDES;
 	++j) {
-      int curr = prev_buf[i - j];
+      double curr = prev_buf[i - j];
       if(curr > 0) {
 	next_buf[i] += curr;
       }
@@ -26,8 +26,8 @@ int main(int argc, char *argv) {
   scanf("%d", &ndice);
   assert(ndice > 0 && ndice < MAX_DICE);
 
-  int bbuf[BUF_SZ];
-  int fbuf[BUF_SZ];
+  double bbuf[BUF_SZ];
+  double fbuf[BUF_SZ];
   // zeroing out
   for(int i = 0; i < BUF_SZ; ++i) {
     bbuf[i] = -1;
@@ -39,7 +39,7 @@ int main(int argc, char *argv) {
     bbuf[i] = 1;
   }
 
-  int *res = bbuf;
+  double *res = bbuf;
   for(int i = 1; i <= ndice; ++i) {
     // alternating buffers
     if (i % 2 == 0) {
@@ -51,13 +51,13 @@ int main(int argc, char *argv) {
     }
   }
 
-  int sum = 0;
+  double sum = 0;
   for(int i = 0; res[i] != -1; ++i) {
     sum += res[i];
   }
 
   for(int i = 0; res[i] != -1; ++i) {
-    printf("%lf\n", res[i] / (double)sum);
+    printf("%f\n", res[i] / sum);
   }
   return 0;
 }
