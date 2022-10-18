@@ -2,3 +2,4 @@ testdir
 debug
 release
 notes
+io/*.io
